@@ -1,0 +1,5 @@
+{
+  "name": "Csodahelyek Térkép",
+  "description": "Fedezd fel Magyarország legszebb helyeit a csodahelyek.hu alapján, interaktív térképpel és előfizetési lehetőséggel.",
+  "requestFramePermissions": ["geolocation"]
+}
