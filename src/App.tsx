@@ -3,27 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  MapPin, 
-  Search, 
-  Star, 
-  Navigation, 
-  CreditCard, 
-  User, 
-  Info, 
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  MapPin,
+  Search,
+  Star,
+  Navigation,
+  User,
+  Info,
   ChevronRight,
   Map as MapIcon,
-  Layers,
-  Compass
+  Compass,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 // Fix for default marker icons in Leaflet with React
-// @ts-ignore
-delete L.Icon.Default.prototype._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -113,14 +111,22 @@ const Navbar = ({ user, onSubscribe, onInstall, showInstallBtn }: {
   </nav>
 );
 
-const Sidebar = ({ 
-  places, 
-  selectedPlace, 
-  onSelectPlace
-}: { 
-  places: Place[], 
-  selectedPlace: Place | null, 
-  onSelectPlace: (p: Place) => void
+const Sidebar = ({
+  places,
+  selectedPlace,
+  onSelectPlace,
+  searchQuery,
+  onSearchChange,
+  isLoading,
+  error
+}: {
+  places: Place[],
+  selectedPlace: Place | null,
+  onSelectPlace: (p: Place) => void,
+  searchQuery: string,
+  onSearchChange: (q: string) => void,
+  isLoading: boolean,
+  error: string | null
 }) => (
   <div className="w-[420px] h-full bg-paper border-r border-zinc-100 flex flex-col pt-20 z-[900] shadow-2xl">
     <div className="p-8 pb-4">
@@ -128,23 +134,37 @@ const Sidebar = ({
       <p className="text-zinc-500 text-sm mb-6">Válogatott helyszínek a természet kedvelőinek.</p>
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-        <input 
-          type="text" 
-          placeholder="Helyszín keresése..." 
+        <input
+          type="text"
+          placeholder="Helyszín keresése..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
           className="w-full pl-12 pr-4 py-3 bg-white border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
         />
       </div>
     </div>
 
     <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar">
-      {places.length === 0 ? (
+      {isLoading ? (
+        <div className="py-20 text-center">
+          <Loader2 size={48} className="mx-auto mb-4 opacity-30 animate-spin" />
+          <p className="font-serif italic text-lg text-zinc-400">Helyszínek betöltése...</p>
+        </div>
+      ) : error ? (
+        <div className="py-20 text-center">
+          <Info size={48} className="mx-auto mb-4 opacity-20 text-red-400" />
+          <p className="font-serif italic text-lg text-red-400">{error}</p>
+        </div>
+      ) : places.length === 0 ? (
         <div className="py-20 text-center">
           <MapIcon size={48} className="mx-auto mb-4 opacity-10" />
-          <p className="font-serif italic text-lg text-zinc-400">Nincsenek még helyszínek...</p>
+          <p className="font-serif italic text-lg text-zinc-400">
+            {searchQuery ? 'Nincs találat a keresésre.' : 'Nincsenek még helyszínek...'}
+          </p>
         </div>
       ) : (
         places.map((place, idx) => (
-          <motion.div 
+          <motion.div
             key={place.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -153,18 +173,23 @@ const Sidebar = ({
             className={`group relative overflow-hidden rounded-[32px] cursor-pointer transition-all duration-500 ${selectedPlace?.id === place.id ? 'ring-2 ring-accent ring-offset-4 ring-offset-paper scale-[1.02]' : 'hover:scale-[1.01]'}`}
           >
             <div className="aspect-[4/3] overflow-hidden">
-              <img 
-                src={place.image_url} 
+              <img
+                src={place.image_url}
                 alt={place.title}
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${place.id}/600/450`;
+                  const target = e.target as HTMLImageElement;
+                  if (!target.dataset.fallback) {
+                    target.dataset.fallback = '1';
+                    target.src = `https://picsum.photos/seed/${place.id}/600/450`;
+                  }
                 }}
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
             </div>
-            
+
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-accent bg-white/90 px-2 py-1 rounded-sm mb-2 inline-block">
                 {place.category}
@@ -252,23 +277,43 @@ export default function App() {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isSubModalOpen, setIsSubModalOpen] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> } | null>(null);
   const [showInstallBtn, setShowInstallBtn] = useState(false);
-  
-  const [mapCenter, setMapCenter] = useState<[number, number]>([47.4979, 19.0402]); // Center on Budapest
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [mapCenter, setMapCenter] = useState<[number, number]>([47.4979, 19.0402]);
   const [mapZoom, setMapZoom] = useState(9);
+
+  const fetchPlaces = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/places');
+      if (!res.ok) throw new Error(`Szerverhiba: ${res.status}`);
+      const data = await res.json();
+      setPlaces(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Nem sikerült betölteni a helyszíneket.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchPlaces();
-    
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setShowInstallBtn(true);
-    });
-  }, []);
 
-  const handleInstallClick = async () => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> });
+      setShowInstallBtn(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, [fetchPlaces]);
+
+  const handleInstallClick = useCallback(async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
@@ -276,7 +321,7 @@ export default function App() {
       setShowInstallBtn(false);
     }
     setDeferredPrompt(null);
-  };
+  }, [deferredPrompt]);
 
   useEffect(() => {
     if (selectedPlace) {
@@ -285,22 +330,33 @@ export default function App() {
     }
   }, [selectedPlace]);
 
-  const fetchPlaces = async () => {
-    const res = await fetch('/api/places');
-    const data = await res.json();
-    setPlaces(data);
-  };
+  const filteredPlaces = useMemo(() => {
+    if (!searchQuery.trim()) return places;
+    const q = searchQuery.toLowerCase();
+    return places.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        (p.description && p.description.toLowerCase().includes(q))
+    );
+  }, [places, searchQuery]);
 
-  const handleSubscribe = async (email: string) => {
-    const res = await fetch('/api/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const data = await res.json();
-    setUser({ email, is_pro: true });
-    setIsSubModalOpen(false);
-  };
+  const handleSubscribe = useCallback(async (email: string) => {
+    if (!email.trim()) return;
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) throw new Error('Feliratkozás sikertelen.');
+      await res.json();
+      setUser({ email, is_pro: true });
+      setIsSubModalOpen(false);
+    } catch {
+      alert('Hiba történt a feliratkozás során. Kérjük, próbáld újra.');
+    }
+  }, []);
 
   return (
     <div className="flex h-screen bg-zinc-100 font-sans text-zinc-900 overflow-hidden">
@@ -311,10 +367,14 @@ export default function App() {
         showInstallBtn={showInstallBtn}
       />
       
-      <Sidebar 
-        places={places} 
-        selectedPlace={selectedPlace} 
+      <Sidebar
+        places={filteredPlaces}
+        selectedPlace={selectedPlace}
         onSelectPlace={setSelectedPlace}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        isLoading={isLoading}
+        error={error}
       />
 
       <main className="flex-1 relative pt-20">
@@ -378,12 +438,16 @@ export default function App() {
               className="absolute top-10 right-10 bottom-10 w-[480px] bg-white rounded-[48px] shadow-2xl overflow-hidden flex flex-col border border-zinc-100 z-[1000]"
             >
               <div className="h-72 shrink-0 relative">
-                <img 
-                  src={selectedPlace.image_url} 
+                <img
+                  src={selectedPlace.image_url}
                   alt={selectedPlace.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${selectedPlace.id}/800/600`;
+                    const target = e.target as HTMLImageElement;
+                    if (!target.dataset.fallback) {
+                      target.dataset.fallback = '1';
+                      target.src = `https://picsum.photos/seed/${selectedPlace.id}/800/600`;
+                    }
                   }}
                   referrerPolicy="no-referrer"
                 />
@@ -404,7 +468,7 @@ export default function App() {
                 <h2 className="font-serif text-5xl font-medium text-zinc-900 leading-[1.1] mb-6">{selectedPlace.title}</h2>
                 <div className="w-12 h-1 bg-accent/20 mb-8" />
                 <p className="text-zinc-500 leading-relaxed text-lg font-light mb-10">
-                  {selectedPlace.description}
+                  {selectedPlace.description || 'Nincs leírás ehhez a helyszínhez.'}
                 </p>
                 
                 <div className="mt-auto pt-8 flex gap-4">
