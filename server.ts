@@ -39,6 +39,15 @@ db.exec(`
     expires_at TEXT NOT NULL,
     used BOOLEAN DEFAULT 0
   );
+
+  CREATE TABLE IF NOT EXISTS favorites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_email TEXT NOT NULL,
+    place_id INTEGER NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(user_email, place_id),
+    FOREIGN KEY (place_id) REFERENCES places(id)
+  );
 `);
 
 // Seed Közép-Magyarország places if DB is empty
@@ -52,7 +61,7 @@ if (count.cnt === 0) {
       lng: 18.7194,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Történelem",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/zsambeki-romtemplom.jpg"
+      image_url: "https://images.unsplash.com/photo-1590080876351-941da357b7c1?w=600&h=450&fit=crop"
     },
     {
       title: "Budakeszi Vadaspark",
@@ -61,7 +70,7 @@ if (count.cnt === 0) {
       lng: 18.9253,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/budakeszi-vadaspark.jpg"
+      image_url: "https://images.unsplash.com/photo-1474511320723-9a56873571b7?w=600&h=450&fit=crop"
     },
     {
       title: "Budakeszi Arborétum",
@@ -70,7 +79,7 @@ if (count.cnt === 0) {
       lng: 18.9189,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/budakeszi-arboretum.jpg"
+      image_url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=450&fit=crop"
     },
     {
       title: "Róka-hegyi kőfejtő",
@@ -79,7 +88,7 @@ if (count.cnt === 0) {
       lng: 19.0139,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/roka-hegyi-kofejto.jpg"
+      image_url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=450&fit=crop"
     },
     {
       title: "Visegrádi Fellegvár",
@@ -88,7 +97,7 @@ if (count.cnt === 0) {
       lng: 18.9775,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Történelem",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/visegradi-fellegvar.jpg"
+      image_url: "https://images.unsplash.com/photo-1599930464470-fcb22b6b0c03?w=600&h=450&fit=crop"
     },
     {
       title: "Szentendre",
@@ -97,7 +106,7 @@ if (count.cnt === 0) {
       lng: 19.0756,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Városnézés",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/szentendre.jpg"
+      image_url: "https://images.unsplash.com/photo-1588253823715-cd1a3f27e03e?w=600&h=450&fit=crop"
     },
     {
       title: "Vácrátóti Nemzeti Botanikus Kert",
@@ -106,7 +115,7 @@ if (count.cnt === 0) {
       lng: 19.2336,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/vacratot-botanikus-kert.jpg"
+      image_url: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&h=450&fit=crop"
     },
     {
       title: "Martonvásári Brunszvik-kastély",
@@ -115,7 +124,7 @@ if (count.cnt === 0) {
       lng: 18.7878,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Történelem",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/brunszvik-kastely.jpg"
+      image_url: "https://images.unsplash.com/photo-1568736333610-eae6e0ab9e75?w=600&h=450&fit=crop"
     },
     {
       title: "Nagybörzsönyi Kisvasút",
@@ -124,7 +133,7 @@ if (count.cnt === 0) {
       lng: 18.9167,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/nagyborzsony.jpg"
+      image_url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=600&h=450&fit=crop"
     },
     {
       title: "Dabasi Szent Jakab sétány",
@@ -133,7 +142,7 @@ if (count.cnt === 0) {
       lng: 19.3208,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/dabas-szent-jakab.jpg"
+      image_url: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&h=450&fit=crop"
     },
     {
       title: "Gödöllői Királyi Kastély",
@@ -142,7 +151,7 @@ if (count.cnt === 0) {
       lng: 19.3536,
       url: "https://csodahelyek.hu/2022/10/21/oszi-kirandulohely-kevesebb-mint-1-orara-budapesttol/",
       category: "Történelem",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2020/06/godolloi-kastely.jpg"
+      image_url: "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?w=600&h=450&fit=crop"
     },
     {
       title: "Tündérszikla – János-hegy",
@@ -151,7 +160,7 @@ if (count.cnt === 0) {
       lng: 18.9528,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2021/02/tundershikla.jpg"
+      image_url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=450&fit=crop"
     },
     {
       title: "Japánkert – Margitsziget",
@@ -160,7 +169,7 @@ if (count.cnt === 0) {
       lng: 19.0514,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2021/02/japankert-margitsziget.jpg"
+      image_url: "https://images.unsplash.com/photo-1528164344705-47542687000d?w=600&h=450&fit=crop"
     },
     {
       title: "Tóth Árpád sétány – Várnegyed",
@@ -169,7 +178,7 @@ if (count.cnt === 0) {
       lng: 19.0347,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Városnézés",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2021/02/toth-arpad-setany.jpg"
+      image_url: "https://images.unsplash.com/photo-1551268424-1a42b12956a1?w=600&h=450&fit=crop"
     },
     {
       title: "Teve-szikla – Pilisborosjenő",
@@ -178,7 +187,7 @@ if (count.cnt === 0) {
       lng: 18.9625,
       url: "https://csodahelyek.hu/2022/10/21/oszi-kirandulohely-kevesebb-mint-1-orara-budapesttol/",
       category: "Természet",
-      image_url: "https://csodahelyek.hu/wp-content/uploads/2022/10/teve-szikla.jpg"
+      image_url: "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=600&h=450&fit=crop"
     }
   ];
 
@@ -211,6 +220,9 @@ const stmtSubscribe = db.prepare("UPDATE users SET is_pro = 1 WHERE email = ?");
 const stmtInsertCode = db.prepare("INSERT INTO verification_codes (email, code, expires_at) VALUES (?, ?, datetime('now', '+10 minutes'))");
 const stmtGetCode = db.prepare("SELECT * FROM verification_codes WHERE email = ? AND code = ? AND used = 0 AND expires_at > datetime('now') ORDER BY id DESC LIMIT 1");
 const stmtUseCode = db.prepare("UPDATE verification_codes SET used = 1 WHERE id = ?");
+const stmtGetFavorites = db.prepare("SELECT place_id FROM favorites WHERE user_email = ?");
+const stmtAddFavorite = db.prepare("INSERT OR IGNORE INTO favorites (user_email, place_id) VALUES (?, ?)");
+const stmtRemoveFavorite = db.prepare("DELETE FROM favorites WHERE user_email = ? AND place_id = ?");
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
@@ -381,6 +393,43 @@ async function startServer() {
       res.json({ success: true, is_pro: 1 });
     } catch {
       res.status(500).json({ error: "Feliratkozási hiba." });
+    }
+  });
+
+  // --- Favorites endpoints ---
+
+  app.get("/api/favorites/:email", (req, res) => {
+    const { email } = req.params;
+    if (!email || !email.includes("@")) {
+      return res.status(400).json({ error: "Érvénytelen e-mail cím." });
+    }
+    const rows = stmtGetFavorites.all(email) as { place_id: number }[];
+    res.json(rows.map(r => r.place_id));
+  });
+
+  app.post("/api/favorites", (req, res) => {
+    const { email, place_id } = req.body;
+    if (!email || !place_id) {
+      return res.status(400).json({ error: "E-mail és helyszín azonosító szükséges." });
+    }
+    try {
+      stmtAddFavorite.run(email.trim(), place_id);
+      res.json({ success: true });
+    } catch {
+      res.status(500).json({ error: "Kedvenc hozzáadása sikertelen." });
+    }
+  });
+
+  app.delete("/api/favorites", (req, res) => {
+    const { email, place_id } = req.body;
+    if (!email || !place_id) {
+      return res.status(400).json({ error: "E-mail és helyszín azonosító szükséges." });
+    }
+    try {
+      stmtRemoveFavorite.run(email.trim(), place_id);
+      res.json({ success: true });
+    } catch {
+      res.status(500).json({ error: "Kedvenc eltávolítása sikertelen." });
     }
   });
 
