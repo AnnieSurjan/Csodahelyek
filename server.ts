@@ -3,7 +3,10 @@ import { createServer as createViteServer } from "vite";
 import Database from "better-sqlite3";
 import path from "path";
 
-const db = new Database("csodahelyek.db");
+const dbPath = process.env.NODE_ENV === "production"
+  ? "/data/csodahelyek.db"
+  : "csodahelyek.db";
+const db = new Database(dbPath);
 
 // Enable WAL mode for better concurrent read performance
 db.pragma("journal_mode = WAL");
@@ -39,7 +42,7 @@ const stmtSubscribe = db.prepare("INSERT OR REPLACE INTO users (email, is_pro) V
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = parseInt(process.env.PORT || "3000", 10);
 
   app.use(express.json());
 
