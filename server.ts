@@ -2,6 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import Database from "better-sqlite3";
 import path from "path";
+import crypto from "crypto";
 
 const db = new Database("csodahelyek.db");
 
@@ -24,7 +25,19 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE,
-    is_pro BOOLEAN DEFAULT 0
+    password_hash TEXT NOT NULL,
+    name TEXT,
+    is_pro BOOLEAN DEFAULT 0,
+    verified BOOLEAN DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS verification_codes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    code TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used BOOLEAN DEFAULT 0
   );
 `);
 
@@ -190,8 +203,22 @@ const stmtInsertPlace = db.prepare(`
   INSERT INTO places (title, description, lat, lng, url, category, image_url)
   VALUES (?, ?, ?, ?, ?, ?, ?)
 `);
-const stmtGetUser = db.prepare("SELECT * FROM users WHERE email = ?");
-const stmtSubscribe = db.prepare("INSERT OR REPLACE INTO users (email, is_pro) VALUES (?, 1)");
+const stmtGetUser = db.prepare("SELECT id, email, name, is_pro, verified FROM users WHERE email = ?");
+const stmtGetUserWithPassword = db.prepare("SELECT * FROM users WHERE email = ?");
+const stmtInsertUser = db.prepare("INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)");
+const stmtVerifyUser = db.prepare("UPDATE users SET verified = 1 WHERE email = ?");
+const stmtSubscribe = db.prepare("UPDATE users SET is_pro = 1 WHERE email = ?");
+const stmtInsertCode = db.prepare("INSERT INTO verification_codes (email, code, expires_at) VALUES (?, ?, datetime('now', '+10 minutes'))");
+const stmtGetCode = db.prepare("SELECT * FROM verification_codes WHERE email = ? AND code = ? AND used = 0 AND expires_at > datetime('now') ORDER BY id DESC LIMIT 1");
+const stmtUseCode = db.prepare("UPDATE verification_codes SET used = 1 WHERE id = ?");
+
+function hashPassword(password: string): string {
+  return crypto.createHash("sha256").update(password).digest("hex");
+}
+
+function generateCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 async function startServer() {
   const app = express();
@@ -238,6 +265,95 @@ async function startServer() {
     }
   });
 
+  // --- Auth endpoints ---
+
+  app.post("/api/register", (req, res) => {
+    const { email, password, name } = req.body;
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return res.status(400).json({ error: "Érvénytelen e-mail cím." });
+    }
+    if (!password || typeof password !== "string" || password.length < 6) {
+      return res.status(400).json({ error: "A jelszónak legalább 6 karakter hosszúnak kell lennie." });
+    }
+
+    const existing = stmtGetUser.get(email.trim());
+    if (existing) {
+      return res.status(409).json({ error: "Ez az e-mail cím már regisztrálva van." });
+    }
+
+    try {
+      const hash = hashPassword(password);
+      stmtInsertUser.run(email.trim(), hash, name?.trim() || null);
+
+      const code = generateCode();
+      stmtInsertCode.run(email.trim(), code);
+      console.log(`[DEMO] Verifikációs kód (${email.trim()}): ${code}`);
+
+      res.json({ success: true, message: "Regisztráció sikeres! Ellenőrizd az e-mail fiókodat.", demo_code: code });
+    } catch {
+      res.status(500).json({ error: "Regisztrációs hiba." });
+    }
+  });
+
+  app.post("/api/verify", (req, res) => {
+    const { email, code } = req.body;
+    if (!email || !code) {
+      return res.status(400).json({ error: "E-mail és kód megadása kötelező." });
+    }
+
+    const record = stmtGetCode.get(email.trim(), code.trim()) as { id: number } | undefined;
+    if (!record) {
+      return res.status(400).json({ error: "Érvénytelen vagy lejárt kód." });
+    }
+
+    try {
+      stmtUseCode.run(record.id);
+      stmtVerifyUser.run(email.trim());
+      const user = stmtGetUser.get(email.trim());
+      res.json({ success: true, user });
+    } catch {
+      res.status(500).json({ error: "Verifikációs hiba." });
+    }
+  });
+
+  app.post("/api/login", (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "E-mail és jelszó megadása kötelező." });
+    }
+
+    const user = stmtGetUserWithPassword.get(email.trim()) as { password_hash: string; verified: number; email: string; name: string; is_pro: number } | undefined;
+    if (!user) {
+      return res.status(401).json({ error: "Hibás e-mail cím vagy jelszó." });
+    }
+
+    const hash = hashPassword(password);
+    if (hash !== user.password_hash) {
+      return res.status(401).json({ error: "Hibás e-mail cím vagy jelszó." });
+    }
+
+    if (!user.verified) {
+      const code = generateCode();
+      stmtInsertCode.run(email.trim(), code);
+      console.log(`[DEMO] Verifikációs kód (${email.trim()}): ${code}`);
+      return res.status(403).json({ error: "A fiók nincs megerősítve. Új kódot küldtünk.", needs_verification: true, demo_code: code });
+    }
+
+    res.json({ success: true, user: { email: user.email, name: user.name, is_pro: user.is_pro, verified: 1 } });
+  });
+
+  app.post("/api/resend-code", (req, res) => {
+    const { email } = req.body;
+    if (!email || !email.includes("@")) {
+      return res.status(400).json({ error: "Érvénytelen e-mail cím." });
+    }
+
+    const code = generateCode();
+    stmtInsertCode.run(email.trim(), code);
+    console.log(`[DEMO] Új verifikációs kód (${email.trim()}): ${code}`);
+    res.json({ success: true, message: "Új kód elküldve!", demo_code: code });
+  });
+
   app.get("/api/user/:email", (req, res) => {
     const { email } = req.params;
     if (!email || !email.includes("@")) {
@@ -255,6 +371,10 @@ async function startServer() {
     const { email } = req.body;
     if (!email || typeof email !== "string" || !email.includes("@")) {
       return res.status(400).json({ error: "Érvénytelen e-mail cím." });
+    }
+    const user = stmtGetUser.get(email.trim()) as { verified: number } | undefined;
+    if (!user) {
+      return res.status(404).json({ error: "Felhasználó nem található." });
     }
     try {
       stmtSubscribe.run(email.trim());

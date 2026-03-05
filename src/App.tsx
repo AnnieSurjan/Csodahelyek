@@ -14,7 +14,14 @@ import {
   ChevronRight,
   Map as MapIcon,
   Compass,
-  Loader2
+  Loader2,
+  Mail,
+  Lock,
+  UserPlus,
+  LogIn,
+  ShieldCheck,
+  ArrowLeft,
+  LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -57,8 +64,231 @@ interface Place {
 
 interface UserProfile {
   email: string;
+  name?: string;
   is_pro: boolean;
+  verified: boolean;
 }
+
+type AuthView = 'login' | 'register' | 'verify';
+
+const AuthScreen = ({ onAuth }: { onAuth: (user: UserProfile) => void }) => {
+  const [view, setView] = useState<AuthView>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [demoCode, setDemoCode] = useState('');
+
+  const handleRegister = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password, name: name.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error); return; }
+      setDemoCode(data.demo_code || '');
+      setView('verify');
+    } catch { setError('Hálózati hiba.'); }
+    finally { setLoading(false); }
+  };
+
+  const handleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password })
+      });
+      const data = await res.json();
+      if (res.status === 403 && data.needs_verification) {
+        setDemoCode(data.demo_code || '');
+        setError('');
+        setView('verify');
+        return;
+      }
+      if (!res.ok) { setError(data.error); return; }
+      onAuth(data.user);
+    } catch { setError('Hálózati hiba.'); }
+    finally { setLoading(false); }
+  };
+
+  const handleVerify = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), code: code.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error); return; }
+      onAuth(data.user);
+    } catch { setError('Hálózati hiba.'); }
+    finally { setLoading(false); }
+  };
+
+  const handleResendCode = async () => {
+    try {
+      const res = await fetch('/api/resend-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDemoCode(data.demo_code || '');
+        setError('');
+      }
+    } catch { /* ignore */ }
+  };
+
+  return (
+    <div className="min-h-screen bg-paper flex items-center justify-center p-4">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/4 w-[800px] h-[800px] bg-emerald-100/40 rounded-full blur-3xl" />
+        <div className="absolute -bottom-1/4 -right-1/4 w-[600px] h-[600px] bg-emerald-50/60 rounded-full blur-3xl" />
+      </div>
+
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="relative bg-white rounded-[32px] shadow-2xl max-w-md w-full overflow-hidden border border-zinc-100"
+      >
+        <div className="bg-gradient-to-br from-emerald-800 to-emerald-900 p-10 text-center">
+          <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
+            <Compass size={32} className="text-white" />
+          </div>
+          <h1 className="font-serif text-3xl font-semibold text-white tracking-tight">Csodahelyek</h1>
+          <p className="text-emerald-200 text-xs uppercase tracking-[0.25em] mt-2 font-bold">Magyarország kincsei</p>
+        </div>
+
+        <div className="p-8">
+          {view === 'login' && (
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+              <h2 className="text-xl font-bold text-zinc-900 mb-1">Bejelentkezés</h2>
+              <p className="text-zinc-500 text-sm mb-6">Üdvözöljük újra! Jelentkezzen be fiókjába.</p>
+
+              <div className="space-y-4">
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                  <input type="email" placeholder="E-mail cím" value={email} onChange={e => setEmail(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                  <input type="password" placeholder="Jelszó" value={password} onChange={e => setPassword(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                </div>
+              </div>
+
+              {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
+
+              <button onClick={handleLogin} disabled={loading}
+                className="w-full mt-6 py-3.5 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
+                {loading ? <Loader2 size={18} className="animate-spin" /> : <LogIn size={18} />}
+                Bejelentkezés
+              </button>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-zinc-500">Még nincs fiókja?{' '}
+                  <button onClick={() => { setView('register'); setError(''); }} className="text-emerald-700 font-semibold hover:underline">
+                    Regisztráció
+                  </button>
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {view === 'register' && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+              <button onClick={() => { setView('login'); setError(''); }} className="text-zinc-400 hover:text-zinc-600 mb-4 flex items-center gap-1 text-sm">
+                <ArrowLeft size={16} /> Vissza
+              </button>
+              <h2 className="text-xl font-bold text-zinc-900 mb-1">Regisztráció</h2>
+              <p className="text-zinc-500 text-sm mb-6">Hozza létre fiókját a felfedezéshez.</p>
+
+              <div className="space-y-4">
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                  <input type="text" placeholder="Teljes név" value={name} onChange={e => setName(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                  <input type="email" placeholder="E-mail cím" value={email} onChange={e => setEmail(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                  <input type="password" placeholder="Jelszó (min. 6 karakter)" value={password} onChange={e => setPassword(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                </div>
+              </div>
+
+              {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
+
+              <button onClick={handleRegister} disabled={loading}
+                className="w-full mt-6 py-3.5 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
+                {loading ? <Loader2 size={18} className="animate-spin" /> : <UserPlus size={18} />}
+                Regisztráció
+              </button>
+            </motion.div>
+          )}
+
+          {view === 'verify' && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <ShieldCheck size={32} />
+                </div>
+                <h2 className="text-xl font-bold text-zinc-900 mb-1">E-mail megerősítés</h2>
+                <p className="text-zinc-500 text-sm">Írja be a(z) <strong>{email}</strong> címre küldött 6 jegyű kódot.</p>
+              </div>
+
+              {demoCode && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-center">
+                  <p className="text-xs text-amber-600 font-bold uppercase tracking-widest mb-1">Demo mód – A kód:</p>
+                  <p className="text-2xl font-mono font-bold text-amber-800 tracking-[0.3em]">{demoCode}</p>
+                </div>
+              )}
+
+              <div className="relative">
+                <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                <input type="text" placeholder="6 jegyű kód" value={code} onChange={e => setCode(e.target.value)} maxLength={6}
+                  className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-center tracking-[0.3em] font-mono text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+              </div>
+
+              {error && <p className="text-red-500 text-sm mt-3 text-center">{error}</p>}
+
+              <button onClick={handleVerify} disabled={loading}
+                className="w-full mt-6 py-3.5 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
+                {loading ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
+                Megerősítés
+              </button>
+
+              <button onClick={handleResendCode} className="w-full mt-3 py-2 text-zinc-400 text-sm hover:text-emerald-600 transition-colors">
+                Új kód küldése
+              </button>
+
+              <button onClick={() => { setView('login'); setError(''); setDemoCode(''); }} className="w-full mt-1 py-2 text-zinc-400 text-sm hover:text-zinc-600 transition-colors flex items-center justify-center gap-1">
+                <ArrowLeft size={14} /> Vissza a bejelentkezéshez
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+};
 
 // --- Components ---
 
@@ -70,11 +300,12 @@ const MapController = ({ center, zoom }: { center: [number, number], zoom: numbe
   return null;
 };
 
-const Navbar = ({ user, onSubscribe, onInstall, showInstallBtn }: { 
-  user: UserProfile | null, 
+const Navbar = ({ user, onSubscribe, onInstall, showInstallBtn, onLogout }: {
+  user: UserProfile | null,
   onSubscribe: () => void,
   onInstall: () => void,
-  showInstallBtn: boolean
+  showInstallBtn: boolean,
+  onLogout: () => void
 }) => (
   <nav className="fixed top-0 left-0 right-0 h-20 glass z-[1000] flex items-center justify-between px-8">
     <div className="flex items-center gap-3">
@@ -86,10 +317,10 @@ const Navbar = ({ user, onSubscribe, onInstall, showInstallBtn }: {
         <p className="text-[10px] uppercase tracking-[0.2em] text-accent font-bold mt-1">Magyarország kincsei</p>
       </div>
     </div>
-    
+
     <div className="flex items-center gap-6">
       {showInstallBtn && (
-        <button 
+        <button
           onClick={onInstall}
           className="hidden md:block text-xs uppercase tracking-widest font-bold hover:text-accent transition-colors"
         >
@@ -97,16 +328,25 @@ const Navbar = ({ user, onSubscribe, onInstall, showInstallBtn }: {
         </button>
       )}
       {!user?.is_pro && (
-        <button 
+        <button
           onClick={onSubscribe}
           className="bg-accent text-white px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/20"
         >
           Pro tagság
         </button>
       )}
-      <div className="w-10 h-10 rounded-full bg-paper border border-zinc-200 flex items-center justify-center text-zinc-600 shadow-sm">
-        <User size={20} />
-      </div>
+      {user && (
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-zinc-600 hidden md:block">{user.name || user.email}</span>
+          <button
+            onClick={onLogout}
+            className="w-10 h-10 rounded-full bg-paper border border-zinc-200 flex items-center justify-center text-zinc-600 shadow-sm hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors"
+            title="Kijelentkezés"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      )}
     </div>
   </nav>
 );
@@ -275,7 +515,10 @@ const SubscriptionModal = ({ isOpen, onClose, onConfirm }: { isOpen: boolean, on
 export default function App() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    const saved = localStorage.getItem('csodahelyek_user');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [isSubModalOpen, setIsSubModalOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> } | null>(null);
   const [showInstallBtn, setShowInstallBtn] = useState(false);
@@ -285,6 +528,20 @@ export default function App() {
 
   const [mapCenter, setMapCenter] = useState<[number, number]>([47.4979, 19.0402]);
   const [mapZoom, setMapZoom] = useState(9);
+
+  const handleAuth = useCallback((userData: UserProfile) => {
+    setUser(userData);
+    localStorage.setItem('csodahelyek_user', JSON.stringify(userData));
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem('csodahelyek_user');
+  }, []);
+
+  if (!user) {
+    return <AuthScreen onAuth={handleAuth} />;
+  }
 
   const fetchPlaces = useCallback(async () => {
     setIsLoading(true);
@@ -341,30 +598,34 @@ export default function App() {
     );
   }, [places, searchQuery]);
 
-  const handleSubscribe = useCallback(async (email: string) => {
-    if (!email.trim()) return;
+  const handleSubscribe = useCallback(async (subEmail: string) => {
+    const emailToUse = subEmail.trim() || user?.email;
+    if (!emailToUse) return;
     try {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email: emailToUse })
       });
       if (!res.ok) throw new Error('Feliratkozás sikertelen.');
       await res.json();
-      setUser({ email, is_pro: true });
+      const updated = { ...user!, is_pro: true };
+      setUser(updated);
+      localStorage.setItem('csodahelyek_user', JSON.stringify(updated));
       setIsSubModalOpen(false);
     } catch {
       alert('Hiba történt a feliratkozás során. Kérjük, próbáld újra.');
     }
-  }, []);
+  }, [user]);
 
   return (
     <div className="flex h-screen bg-zinc-100 font-sans text-zinc-900 overflow-hidden">
-      <Navbar 
-        user={user} 
-        onSubscribe={() => setIsSubModalOpen(true)} 
+      <Navbar
+        user={user}
+        onSubscribe={() => setIsSubModalOpen(true)}
         onInstall={handleInstallClick}
         showInstallBtn={showInstallBtn}
+        onLogout={handleLogout}
       />
       
       <Sidebar
