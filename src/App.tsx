@@ -21,7 +21,11 @@ import {
   LogIn,
   ShieldCheck,
   ArrowLeft,
-  LogOut
+  LogOut,
+  X,
+  Heart,
+  Menu,
+  ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -47,7 +51,7 @@ const selectedIcon = new L.Icon({
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
-  className: 'hue-rotate-[140deg]' // Emerald-ish
+  className: 'hue-rotate-[140deg]'
 });
 
 // --- Types ---
@@ -71,6 +75,9 @@ interface UserProfile {
 
 type AuthView = 'login' | 'register' | 'verify';
 
+const CATEGORIES = ['Mind', 'Természet', 'Történelem', 'Városnézés'] as const;
+
+// --- Auth Screen ---
 const AuthScreen = ({ onAuth }: { onAuth: (user: UserProfile) => void }) => {
   const [view, setView] = useState<AuthView>('login');
   const [email, setEmail] = useState('');
@@ -161,44 +168,44 @@ const AuthScreen = ({ onAuth }: { onAuth: (user: UserProfile) => void }) => {
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="relative bg-white rounded-[32px] shadow-2xl max-w-md w-full overflow-hidden border border-zinc-100"
+        className="relative bg-white rounded-3xl md:rounded-[32px] shadow-2xl max-w-md w-full overflow-hidden border border-zinc-100"
       >
-        <div className="bg-gradient-to-br from-emerald-800 to-emerald-900 p-10 text-center">
-          <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
-            <Compass size={32} className="text-white" />
+        <div className="bg-gradient-to-br from-emerald-800 to-emerald-900 p-8 md:p-10 text-center">
+          <div className="w-14 h-14 md:w-16 md:h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
+            <Compass size={28} className="text-white" />
           </div>
-          <h1 className="font-serif text-3xl font-semibold text-white tracking-tight">Csodahelyek</h1>
-          <p className="text-emerald-200 text-xs uppercase tracking-[0.25em] mt-2 font-bold">Magyarország kincsei</p>
+          <h1 className="font-serif text-2xl md:text-3xl font-semibold text-white tracking-tight">Csodahelyek</h1>
+          <p className="text-emerald-200 text-[10px] md:text-xs uppercase tracking-[0.25em] mt-2 font-bold">Magyarország kincsei</p>
         </div>
 
-        <div className="p-8">
+        <div className="p-6 md:p-8">
           {view === 'login' && (
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 className="text-xl font-bold text-zinc-900 mb-1">Bejelentkezés</h2>
-              <p className="text-zinc-500 text-sm mb-6">Üdvözöljük újra! Jelentkezzen be fiókjába.</p>
+              <h2 className="text-lg md:text-xl font-bold text-zinc-900 mb-1">Bejelentkezés</h2>
+              <p className="text-zinc-500 text-sm mb-5">Üdvözöljük újra! Jelentkezzen be fiókjába.</p>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                   <input type="email" placeholder="E-mail cím" value={email} onChange={e => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                    className="w-full pl-12 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                   <input type="password" placeholder="Jelszó" value={password} onChange={e => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                    className="w-full pl-12 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
                 </div>
               </div>
 
               {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
 
               <button onClick={handleLogin} disabled={loading}
-                className="w-full mt-6 py-3.5 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
+                className="w-full mt-5 py-3 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
                 {loading ? <Loader2 size={18} className="animate-spin" /> : <LogIn size={18} />}
                 Bejelentkezés
               </button>
 
-              <div className="mt-6 text-center">
+              <div className="mt-5 text-center">
                 <p className="text-sm text-zinc-500">Még nincs fiókja?{' '}
                   <button onClick={() => { setView('register'); setError(''); }} className="text-emerald-700 font-semibold hover:underline">
                     Regisztráció
@@ -210,34 +217,34 @@ const AuthScreen = ({ onAuth }: { onAuth: (user: UserProfile) => void }) => {
 
           {view === 'register' && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <button onClick={() => { setView('login'); setError(''); }} className="text-zinc-400 hover:text-zinc-600 mb-4 flex items-center gap-1 text-sm">
+              <button onClick={() => { setView('login'); setError(''); }} className="text-zinc-400 hover:text-zinc-600 mb-3 flex items-center gap-1 text-sm">
                 <ArrowLeft size={16} /> Vissza
               </button>
-              <h2 className="text-xl font-bold text-zinc-900 mb-1">Regisztráció</h2>
-              <p className="text-zinc-500 text-sm mb-6">Hozza létre fiókját a felfedezéshez.</p>
+              <h2 className="text-lg md:text-xl font-bold text-zinc-900 mb-1">Regisztráció</h2>
+              <p className="text-zinc-500 text-sm mb-5">Hozza létre fiókját a felfedezéshez.</p>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                   <input type="text" placeholder="Teljes név" value={name} onChange={e => setName(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                    className="w-full pl-12 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
                 </div>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                   <input type="email" placeholder="E-mail cím" value={email} onChange={e => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                    className="w-full pl-12 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                   <input type="password" placeholder="Jelszó (min. 6 karakter)" value={password} onChange={e => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                    className="w-full pl-12 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
                 </div>
               </div>
 
               {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
 
               <button onClick={handleRegister} disabled={loading}
-                className="w-full mt-6 py-3.5 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
+                className="w-full mt-5 py-3 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
                 {loading ? <Loader2 size={18} className="animate-spin" /> : <UserPlus size={18} />}
                 Regisztráció
               </button>
@@ -246,17 +253,17 @@ const AuthScreen = ({ onAuth }: { onAuth: (user: UserProfile) => void }) => {
 
           {view === 'verify' && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <ShieldCheck size={32} />
+              <div className="text-center mb-5">
+                <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                  <ShieldCheck size={28} />
                 </div>
-                <h2 className="text-xl font-bold text-zinc-900 mb-1">E-mail megerősítés</h2>
+                <h2 className="text-lg md:text-xl font-bold text-zinc-900 mb-1">E-mail megerősítés</h2>
                 <p className="text-zinc-500 text-sm">Írja be a(z) <strong>{email}</strong> címre küldött 6 jegyű kódot.</p>
               </div>
 
               {demoCode && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-center">
-                  <p className="text-xs text-amber-600 font-bold uppercase tracking-widest mb-1">Demo mód – A kód:</p>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-center">
+                  <p className="text-[10px] text-amber-600 font-bold uppercase tracking-widest mb-1">Demo mód – A kód:</p>
                   <p className="text-2xl font-mono font-bold text-amber-800 tracking-[0.3em]">{demoCode}</p>
                 </div>
               )}
@@ -264,13 +271,13 @@ const AuthScreen = ({ onAuth }: { onAuth: (user: UserProfile) => void }) => {
               <div className="relative">
                 <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                 <input type="text" placeholder="6 jegyű kód" value={code} onChange={e => setCode(e.target.value)} maxLength={6}
-                  className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-center tracking-[0.3em] font-mono text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                  className="w-full pl-12 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-center tracking-[0.3em] font-mono text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
               </div>
 
               {error && <p className="text-red-500 text-sm mt-3 text-center">{error}</p>}
 
               <button onClick={handleVerify} disabled={loading}
-                className="w-full mt-6 py-3.5 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
+                className="w-full mt-5 py-3 bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 disabled:opacity-50">
                 {loading ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
                 Megerősítés
               </button>
@@ -300,29 +307,35 @@ const MapController = ({ center, zoom }: { center: [number, number], zoom: numbe
   return null;
 };
 
-const Navbar = ({ user, onSubscribe, onInstall, showInstallBtn, onLogout }: {
+const Navbar = ({ user, onSubscribe, onInstall, showInstallBtn, onLogout, onToggleSidebar, sidebarOpen }: {
   user: UserProfile | null,
   onSubscribe: () => void,
   onInstall: () => void,
   showInstallBtn: boolean,
-  onLogout: () => void
+  onLogout: () => void,
+  onToggleSidebar: () => void,
+  sidebarOpen: boolean
 }) => (
-  <nav className="fixed top-0 left-0 right-0 h-20 glass z-[1000] flex items-center justify-between px-8">
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center text-white shadow-lg shadow-accent/20">
-        <Compass size={22} />
+  <nav className="fixed top-0 left-0 right-0 h-14 md:h-20 glass z-[1000] flex items-center justify-between px-3 md:px-8">
+    <div className="flex items-center gap-2 md:gap-3">
+      <button onClick={onToggleSidebar} className="md:hidden w-9 h-9 flex items-center justify-center text-zinc-600 hover:text-accent">
+        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+      <div className="w-8 h-8 md:w-10 md:h-10 bg-accent rounded-full flex items-center justify-center text-white shadow-lg shadow-accent/20">
+        <Compass size={18} className="md:hidden" />
+        <Compass size={22} className="hidden md:block" />
       </div>
       <div>
-        <h1 className="font-serif text-2xl font-semibold tracking-tight leading-none">Csodahelyek</h1>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-accent font-bold mt-1">Magyarország kincsei</p>
+        <h1 className="font-serif text-lg md:text-2xl font-semibold tracking-tight leading-none">Csodahelyek</h1>
+        <p className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] text-accent font-bold mt-0.5">Magyarország kincsei</p>
       </div>
     </div>
 
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-2 md:gap-6">
       {showInstallBtn && (
         <button
           onClick={onInstall}
-          className="hidden md:block text-xs uppercase tracking-widest font-bold hover:text-accent transition-colors"
+          className="hidden lg:block text-xs uppercase tracking-widest font-bold hover:text-accent transition-colors"
         >
           App Telepítése
         </button>
@@ -330,25 +343,92 @@ const Navbar = ({ user, onSubscribe, onInstall, showInstallBtn, onLogout }: {
       {!user?.is_pro && (
         <button
           onClick={onSubscribe}
-          className="bg-accent text-white px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/20"
+          className="bg-accent text-white px-3 md:px-6 py-1.5 md:py-2.5 rounded-full text-[10px] md:text-xs uppercase tracking-widest font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/20"
         >
-          Pro tagság
+          Pro
         </button>
       )}
       {user && (
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-zinc-600 hidden md:block">{user.name || user.email}</span>
+        <div className="flex items-center gap-2 md:gap-3">
+          <span className="text-sm text-zinc-600 hidden lg:block">{user.name || user.email}</span>
           <button
             onClick={onLogout}
-            className="w-10 h-10 rounded-full bg-paper border border-zinc-200 flex items-center justify-center text-zinc-600 shadow-sm hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors"
+            className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-paper border border-zinc-200 flex items-center justify-center text-zinc-600 shadow-sm hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors"
             title="Kijelentkezés"
           >
-            <LogOut size={18} />
+            <LogOut size={16} />
           </button>
         </div>
       )}
     </div>
   </nav>
+);
+
+const CategoryChips = ({ selected, onSelect }: { selected: string, onSelect: (c: string) => void }) => (
+  <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+    {CATEGORIES.map(cat => (
+      <button
+        key={cat}
+        onClick={() => onSelect(cat)}
+        className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
+          selected === cat
+            ? 'bg-accent text-white shadow-md shadow-accent/20'
+            : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
+        }`}
+      >
+        {cat}
+      </button>
+    ))}
+  </div>
+);
+
+const PlaceCard: React.FC<{
+  place: Place,
+  isSelected: boolean,
+  isFavorite: boolean,
+  onSelect: () => void,
+  onToggleFavorite: (e: React.MouseEvent) => void,
+}> = ({ place, isSelected, isFavorite, onSelect, onToggleFavorite }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    onClick={onSelect}
+    className={`group relative overflow-hidden rounded-2xl md:rounded-[32px] cursor-pointer transition-all duration-500 ${isSelected ? 'ring-2 ring-accent ring-offset-2 ring-offset-paper scale-[1.02]' : 'hover:scale-[1.01]'}`}
+  >
+    <div className="aspect-[16/10] md:aspect-[4/3] overflow-hidden">
+      <img
+        src={place.image_url}
+        alt={place.title}
+        loading="lazy"
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          if (!target.dataset.fallback) {
+            target.dataset.fallback = '1';
+            target.src = `https://picsum.photos/seed/${place.id}/600/450`;
+          }
+        }}
+        referrerPolicy="no-referrer"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+    </div>
+
+    <button
+      onClick={onToggleFavorite}
+      className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+        isFavorite ? 'bg-red-500 text-white' : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/40'
+      }`}
+    >
+      <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
+    </button>
+
+    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
+      <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] font-bold text-accent bg-white/90 px-2 py-0.5 md:py-1 rounded-sm mb-1.5 inline-block">
+        {place.category}
+      </span>
+      <h3 className="font-serif text-lg md:text-2xl leading-tight group-hover:translate-x-1 transition-transform">{place.title}</h3>
+    </div>
+  </motion.div>
 );
 
 const Sidebar = ({
@@ -358,7 +438,12 @@ const Sidebar = ({
   searchQuery,
   onSearchChange,
   isLoading,
-  error
+  error,
+  isOpen,
+  selectedCategory,
+  onCategoryChange,
+  favorites,
+  onToggleFavorite
 }: {
   places: Place[],
   selectedPlace: Place | null,
@@ -366,25 +451,39 @@ const Sidebar = ({
   searchQuery: string,
   onSearchChange: (q: string) => void,
   isLoading: boolean,
-  error: string | null
+  error: string | null,
+  isOpen: boolean,
+  selectedCategory: string,
+  onCategoryChange: (c: string) => void,
+  favorites: Set<number>,
+  onToggleFavorite: (placeId: number) => void
 }) => (
-  <div className="w-[420px] h-full bg-paper border-r border-zinc-100 flex flex-col pt-20 z-[900] shadow-2xl">
-    <div className="p-8 pb-4">
-      <h2 className="font-serif text-4xl mb-2 italic">Felfedezés</h2>
-      <p className="text-zinc-500 text-sm mb-6">Válogatott helyszínek a természet kedvelőinek.</p>
-      <div className="relative">
+  <div className={`
+    fixed md:relative inset-0 md:inset-auto top-14 md:top-0
+    w-full md:w-[420px] h-[calc(100vh-3.5rem)] md:h-full
+    bg-paper border-r border-zinc-100 flex flex-col md:pt-20 z-[900] shadow-2xl
+    transition-transform duration-300 ease-in-out
+    ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:hidden'}
+  `}>
+    <div className="p-4 md:p-8 pb-3 md:pb-4">
+      <h2 className="font-serif text-2xl md:text-4xl mb-1 md:mb-2 italic">Felfedezés</h2>
+      <p className="text-zinc-500 text-xs md:text-sm mb-3 md:mb-4">Válogatott helyszínek a természet kedvelőinek.</p>
+
+      <div className="relative mb-3">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
         <input
           type="text"
           placeholder="Helyszín keresése..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 bg-white border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
+          className="w-full pl-12 pr-4 py-2.5 md:py-3 bg-white border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
         />
       </div>
+
+      <CategoryChips selected={selectedCategory} onSelect={onCategoryChange} />
     </div>
 
-    <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar">
+    <div className="flex-1 overflow-y-auto px-4 md:px-6 py-3 md:py-4 space-y-4 md:space-y-6 custom-scrollbar">
       {isLoading ? (
         <div className="py-20 text-center">
           <Loader2 size={48} className="mx-auto mb-4 opacity-30 animate-spin" />
@@ -403,68 +502,114 @@ const Sidebar = ({
           </p>
         </div>
       ) : (
-        places.map((place, idx) => (
-          <motion.div
+        places.map((place) => (
+          <PlaceCard
             key={place.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            onClick={() => onSelectPlace(place)}
-            className={`group relative overflow-hidden rounded-[32px] cursor-pointer transition-all duration-500 ${selectedPlace?.id === place.id ? 'ring-2 ring-accent ring-offset-4 ring-offset-paper scale-[1.02]' : 'hover:scale-[1.01]'}`}
-          >
-            <div className="aspect-[4/3] overflow-hidden">
-              <img
-                src={place.image_url}
-                alt={place.title}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  if (!target.dataset.fallback) {
-                    target.dataset.fallback = '1';
-                    target.src = `https://picsum.photos/seed/${place.id}/600/450`;
-                  }
-                }}
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-            </div>
-
-            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-              <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-accent bg-white/90 px-2 py-1 rounded-sm mb-2 inline-block">
-                {place.category}
-              </span>
-              <h3 className="font-serif text-2xl leading-tight group-hover:translate-x-1 transition-transform">{place.title}</h3>
-            </div>
-          </motion.div>
+            place={place}
+            isSelected={selectedPlace?.id === place.id}
+            isFavorite={favorites.has(place.id)}
+            onSelect={() => onSelectPlace(place)}
+            onToggleFavorite={(e) => { e.stopPropagation(); onToggleFavorite(place.id); }}
+          />
         ))
       )}
     </div>
   </div>
 );
 
+const PlaceDetail = ({ place, onClose, isFavorite, onToggleFavorite }: {
+  place: Place,
+  onClose: () => void,
+  isFavorite: boolean,
+  onToggleFavorite: () => void
+}) => (
+  <motion.div
+    initial={{ x: '100%', opacity: 0 }}
+    animate={{ x: 0, opacity: 1 }}
+    exit={{ x: '100%', opacity: 0 }}
+    transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+    className="fixed md:absolute inset-0 md:inset-auto md:top-4 md:right-4 md:bottom-4 md:w-[480px] bg-white md:rounded-[48px] shadow-2xl overflow-hidden flex flex-col border-0 md:border md:border-zinc-100 z-[1100]"
+  >
+    <div className="h-56 md:h-72 shrink-0 relative">
+      <img
+        src={place.image_url}
+        alt={place.title}
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          if (!target.dataset.fallback) {
+            target.dataset.fallback = '1';
+            target.src = `https://picsum.photos/seed/${place.id}/800/600`;
+          }
+        }}
+        referrerPolicy="no-referrer"
+      />
+      <button
+        onClick={onClose}
+        className="absolute top-4 left-4 md:top-6 md:left-auto md:right-6 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors"
+      >
+        <ChevronLeft size={24} className="md:hidden" />
+        <ChevronRight size={24} className="hidden md:block" />
+      </button>
+      <button
+        onClick={onToggleFavorite}
+        className={`absolute top-4 right-4 md:top-6 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+          isFavorite ? 'bg-red-500 text-white' : 'bg-white/20 backdrop-blur-md text-white hover:bg-white/40'
+        }`}
+      >
+        <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
+      </button>
+      <div className="absolute bottom-4 left-6 md:bottom-6 md:left-8">
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white bg-accent px-3 py-1.5 rounded-full shadow-lg">
+          {place.category}
+        </span>
+      </div>
+    </div>
+
+    <div className="flex-1 p-6 md:p-10 flex flex-col overflow-y-auto custom-scrollbar">
+      <h2 className="font-serif text-3xl md:text-5xl font-medium text-zinc-900 leading-[1.1] mb-4 md:mb-6">{place.title}</h2>
+      <div className="w-12 h-1 bg-accent/20 mb-6 md:mb-8" />
+      <p className="text-zinc-500 leading-relaxed text-base md:text-lg font-light mb-8 md:mb-10">
+        {place.description || 'Nincs leírás ehhez a helyszínhez.'}
+      </p>
+
+      <div className="mt-auto pt-6 md:pt-8">
+        <a
+          href={place.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full bg-accent text-white py-3.5 md:py-4 rounded-full text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-3 hover:bg-accent/90 transition-all shadow-xl shadow-accent/20"
+        >
+          <Info size={18} />
+          Weboldal megnyitása
+        </a>
+      </div>
+    </div>
+  </motion.div>
+);
+
 const SubscriptionModal = ({ isOpen, onClose, onConfirm }: { isOpen: boolean, onClose: () => void, onConfirm: (email: string) => void }) => {
   const [email, setEmail] = useState('');
-  
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+        className="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
       >
-        <div className="p-8 text-center">
-          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Star size={32} fill="currentColor" />
+        <div className="p-6 md:p-8 text-center">
+          <div className="w-14 h-14 md:w-16 md:h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6">
+            <Star size={28} fill="currentColor" />
           </div>
-          <h2 className="text-2xl font-bold text-zinc-900 mb-2">Csodahelyek Pro</h2>
-          <p className="text-zinc-500 mb-8">Férj hozzá az összes rejtett kincshez, mentsd el kedvenceidet és tervezz útvonalakat korlátok nélkül.</p>
-          
-          <div className="space-y-4 mb-8">
+          <h2 className="text-xl md:text-2xl font-bold text-zinc-900 mb-2">Csodahelyek Pro</h2>
+          <p className="text-zinc-500 text-sm mb-6 md:mb-8">Férj hozzá az összes rejtett kincshez, mentsd el kedvenceidet és tervezz útvonalakat korlátok nélkül.</p>
+
+          <div className="space-y-3 mb-6 md:mb-8">
             <div className="flex items-center gap-3 text-left p-3 bg-zinc-50 rounded-xl">
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
                 <Navigation size={16} />
               </div>
               <div>
@@ -473,7 +618,7 @@ const SubscriptionModal = ({ isOpen, onClose, onConfirm }: { isOpen: boolean, on
               </div>
             </div>
             <div className="flex items-center gap-3 text-left p-3 bg-zinc-50 rounded-xl">
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
                 <MapPin size={16} />
               </div>
               <div>
@@ -484,20 +629,20 @@ const SubscriptionModal = ({ isOpen, onClose, onConfirm }: { isOpen: boolean, on
           </div>
 
           <div className="space-y-3">
-            <input 
-              type="email" 
-              placeholder="E-mail címed" 
+            <input
+              type="email"
+              placeholder="E-mail címed"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
             />
-            <button 
+            <button
               onClick={() => onConfirm(email)}
               className="w-full py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20"
             >
               Előfizetés indítása - 1.990 Ft / hó
             </button>
-            <button 
+            <button
               onClick={onClose}
               className="w-full py-3 text-zinc-400 text-sm hover:text-zinc-600 transition-colors"
             >
@@ -525,6 +670,9 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('Mind');
+  const [favorites, setFavorites] = useState<Set<number>>(new Set());
 
   const [mapCenter, setMapCenter] = useState<[number, number]>([47.4979, 19.0402]);
   const [mapZoom, setMapZoom] = useState(9);
@@ -558,8 +706,20 @@ export default function App() {
     }
   }, []);
 
+  const fetchFavorites = useCallback(async () => {
+    if (!user?.email) return;
+    try {
+      const res = await fetch(`/api/favorites/${encodeURIComponent(user.email)}`);
+      if (res.ok) {
+        const ids: number[] = await res.json();
+        setFavorites(new Set(ids));
+      }
+    } catch { /* ignore */ }
+  }, [user?.email]);
+
   useEffect(() => {
     fetchPlaces();
+    fetchFavorites();
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -568,7 +728,7 @@ export default function App() {
     };
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, [fetchPlaces]);
+  }, [fetchPlaces, fetchFavorites]);
 
   const handleInstallClick = useCallback(async () => {
     if (!deferredPrompt) return;
@@ -580,23 +740,57 @@ export default function App() {
     setDeferredPrompt(null);
   }, [deferredPrompt]);
 
-  useEffect(() => {
-    if (selectedPlace) {
-      setMapCenter([selectedPlace.lat, selectedPlace.lng]);
-      setMapZoom(13);
+  const handleToggleFavorite = useCallback(async (placeId: number) => {
+    if (!user?.email) return;
+    const isFav = favorites.has(placeId);
+    // Optimistic update
+    setFavorites(prev => {
+      const next = new Set(prev);
+      if (isFav) next.delete(placeId);
+      else next.add(placeId);
+      return next;
+    });
+
+    try {
+      await fetch('/api/favorites', {
+        method: isFav ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email, place_id: placeId })
+      });
+    } catch {
+      // Revert on failure
+      setFavorites(prev => {
+        const next = new Set(prev);
+        if (isFav) next.add(placeId);
+        else next.delete(placeId);
+        return next;
+      });
     }
-  }, [selectedPlace]);
+  }, [user?.email, favorites]);
+
+  const handleSelectPlace = useCallback((place: Place) => {
+    setSelectedPlace(place);
+    setSidebarOpen(false);
+    setMapCenter([place.lat, place.lng]);
+    setMapZoom(13);
+  }, []);
 
   const filteredPlaces = useMemo(() => {
-    if (!searchQuery.trim()) return places;
-    const q = searchQuery.toLowerCase();
-    return places.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        (p.description && p.description.toLowerCase().includes(q))
-    );
-  }, [places, searchQuery]);
+    let result = places;
+    if (selectedCategory !== 'Mind') {
+      result = result.filter(p => p.category === selectedCategory);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          (p.description && p.description.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }, [places, searchQuery, selectedCategory]);
 
   const handleSubscribe = useCallback(async (subEmail: string) => {
     const emailToUse = subEmail.trim() || user?.email;
@@ -626,23 +820,51 @@ export default function App() {
         onInstall={handleInstallClick}
         showInstallBtn={showInstallBtn}
         onLogout={handleLogout}
-      />
-      
-      <Sidebar
-        places={filteredPlaces}
-        selectedPlace={selectedPlace}
-        onSelectPlace={setSelectedPlace}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        isLoading={isLoading}
-        error={error}
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        sidebarOpen={sidebarOpen}
       />
 
-      <main className="flex-1 relative pt-20">
+      {/* Desktop sidebar - always visible on md+ */}
+      <div className="hidden md:block">
+        <Sidebar
+          places={filteredPlaces}
+          selectedPlace={selectedPlace}
+          onSelectPlace={handleSelectPlace}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          isLoading={isLoading}
+          error={error}
+          isOpen={true}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+        />
+      </div>
+
+      {/* Mobile sidebar - toggle */}
+      <div className="md:hidden">
+        <Sidebar
+          places={filteredPlaces}
+          selectedPlace={selectedPlace}
+          onSelectPlace={handleSelectPlace}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          isLoading={isLoading}
+          error={error}
+          isOpen={sidebarOpen}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+        />
+      </div>
+
+      <main className="flex-1 relative pt-14 md:pt-20">
         <div className="absolute inset-0 z-0 grayscale-[0.2] sepia-[0.1] brightness-[1.05]">
-          <MapContainer 
-            center={mapCenter} 
-            zoom={mapZoom} 
+          <MapContainer
+            center={mapCenter}
+            zoom={mapZoom}
             style={{ height: '100%', width: '100%' }}
             zoomControl={false}
           >
@@ -651,23 +873,23 @@ export default function App() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <MapController center={mapCenter} zoom={mapZoom} />
-            
+
             {places.map(place => (
-              <Marker 
-                key={place.id} 
+              <Marker
+                key={place.id}
                 position={[place.lat, place.lng]}
                 icon={selectedPlace?.id === place.id ? selectedIcon : customIcon}
                 eventHandlers={{
-                  click: () => setSelectedPlace(place),
+                  click: () => handleSelectPlace(place),
                 }}
               >
                 <Popup className="custom-popup">
-                  <div className="p-2 min-w-[180px]">
+                  <div className="p-2 min-w-[160px]">
                     <p className="text-[9px] uppercase tracking-widest text-accent font-bold mb-1">{place.category}</p>
-                    <h3 className="font-serif text-lg leading-tight text-zinc-900">{place.title}</h3>
-                    <button 
-                      onClick={() => setSelectedPlace(place)}
-                      className="mt-3 text-[10px] uppercase tracking-widest font-bold text-zinc-400 hover:text-accent transition-colors"
+                    <h3 className="font-serif text-base md:text-lg leading-tight text-zinc-900">{place.title}</h3>
+                    <button
+                      onClick={() => handleSelectPlace(place)}
+                      className="mt-2 text-[10px] uppercase tracking-widest font-bold text-zinc-400 hover:text-accent transition-colors"
                     >
                       Részletek
                     </button>
@@ -679,82 +901,32 @@ export default function App() {
         </div>
 
         {/* Map Controls */}
-        <div className="absolute bottom-10 right-10 flex flex-col gap-3 z-[1000]">
-          <button 
+        <div className="absolute bottom-6 right-4 md:bottom-10 md:right-10 flex flex-col gap-3 z-[1000]">
+          <button
             onClick={() => { setMapCenter([47.4979, 19.0402]); setMapZoom(9); }}
-            className="w-14 h-14 bg-white rounded-full shadow-2xl flex items-center justify-center text-zinc-600 hover:text-accent transition-all hover:scale-110 active:scale-95 border border-zinc-100"
+            className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-full shadow-2xl flex items-center justify-center text-zinc-600 hover:text-accent transition-all hover:scale-110 active:scale-95 border border-zinc-100"
             title="Vissza a központba"
           >
-            <Compass size={24} />
+            <Compass size={22} />
           </button>
         </div>
 
         {/* Place Detail Overlay */}
         <AnimatePresence>
           {selectedPlace && (
-            <motion.div 
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 100, opacity: 0 }}
-              className="absolute top-10 right-10 bottom-10 w-[480px] bg-white rounded-[48px] shadow-2xl overflow-hidden flex flex-col border border-zinc-100 z-[1000]"
-            >
-              <div className="h-72 shrink-0 relative">
-                <img
-                  src={selectedPlace.image_url}
-                  alt={selectedPlace.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (!target.dataset.fallback) {
-                      target.dataset.fallback = '1';
-                      target.src = `https://picsum.photos/seed/${selectedPlace.id}/800/600`;
-                    }
-                  }}
-                  referrerPolicy="no-referrer"
-                />
-                <button 
-                  onClick={() => setSelectedPlace(null)}
-                  className="absolute top-6 right-6 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors"
-                >
-                  <ChevronRight size={24} />
-                </button>
-                <div className="absolute bottom-6 left-8">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white bg-accent px-3 py-1.5 rounded-full shadow-lg">
-                    {selectedPlace.category}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="flex-1 p-10 flex flex-col overflow-y-auto custom-scrollbar">
-                <h2 className="font-serif text-5xl font-medium text-zinc-900 leading-[1.1] mb-6">{selectedPlace.title}</h2>
-                <div className="w-12 h-1 bg-accent/20 mb-8" />
-                <p className="text-zinc-500 leading-relaxed text-lg font-light mb-10">
-                  {selectedPlace.description || 'Nincs leírás ehhez a helyszínhez.'}
-                </p>
-                
-                <div className="mt-auto pt-8 flex gap-4">
-                  <a 
-                    href={selectedPlace.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex-1 bg-accent text-white py-4 rounded-full text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-3 hover:bg-accent/90 transition-all shadow-xl shadow-accent/20"
-                  >
-                    <Info size={18} />
-                    Weboldal megnyitása
-                  </a>
-                  <button className="w-14 h-14 bg-paper text-accent rounded-full hover:bg-zinc-50 transition-all flex items-center justify-center border border-zinc-100 shadow-sm">
-                    <Star size={24} />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+            <PlaceDetail
+              place={selectedPlace}
+              onClose={() => setSelectedPlace(null)}
+              isFavorite={favorites.has(selectedPlace.id)}
+              onToggleFavorite={() => handleToggleFavorite(selectedPlace.id)}
+            />
           )}
         </AnimatePresence>
       </main>
 
-      <SubscriptionModal 
-        isOpen={isSubModalOpen} 
-        onClose={() => setIsSubModalOpen(false)} 
+      <SubscriptionModal
+        isOpen={isSubModalOpen}
+        onClose={() => setIsSubModalOpen(false)}
         onConfirm={handleSubscribe}
       />
 
@@ -774,6 +946,13 @@ export default function App() {
         }
         .leaflet-container {
           background: #f4f4f5;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </div>
