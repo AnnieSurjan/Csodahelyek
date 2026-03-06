@@ -19,7 +19,8 @@ db.exec(`
     lng REAL,
     url TEXT UNIQUE,
     category TEXT,
-    image_url TEXT
+    image_url TEXT,
+    region TEXT DEFAULT 'Közép-Magyarország'
   );
 
   CREATE TABLE IF NOT EXISTS users (
@@ -50,9 +51,14 @@ db.exec(`
   );
 `);
 
-// Seed Közép-Magyarország places if DB is empty
+// Add region column if missing (migration for existing DBs)
+try {
+  db.exec("ALTER TABLE places ADD COLUMN region TEXT DEFAULT 'Közép-Magyarország'");
+} catch { /* column already exists */ }
+
+// Seed places
 const count = db.prepare("SELECT COUNT(*) as cnt FROM places").get() as { cnt: number };
-if (count.cnt === 0) {
+{
   const seedPlaces = [
     {
       title: "Zsámbéki Premontrei kolostor",
@@ -61,7 +67,8 @@ if (count.cnt === 0) {
       lng: 18.7194,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Történelem",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Zs%C3%A1mb%C3%A9k_-_Church_ruins.jpg/600px-Zs%C3%A1mb%C3%A9k_-_Church_ruins.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Zs%C3%A1mb%C3%A9k_-_Church_ruins.jpg/600px-Zs%C3%A1mb%C3%A9k_-_Church_ruins.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Budakeszi Vadaspark",
@@ -70,7 +77,8 @@ if (count.cnt === 0) {
       lng: 18.9253,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Budakeszi_Vadaspark_-_panoramio_%281%29.jpg/600px-Budakeszi_Vadaspark_-_panoramio_%281%29.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Budakeszi_Vadaspark_-_panoramio_%281%29.jpg/600px-Budakeszi_Vadaspark_-_panoramio_%281%29.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Budakeszi Arborétum",
@@ -79,7 +87,8 @@ if (count.cnt === 0) {
       lng: 18.9189,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Budakeszi%2C_arboretum.jpg/600px-Budakeszi%2C_arboretum.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Budakeszi%2C_arboretum.jpg/600px-Budakeszi%2C_arboretum.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Róka-hegyi kőfejtő",
@@ -88,7 +97,8 @@ if (count.cnt === 0) {
       lng: 19.0139,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/R%C3%B3ka-hegyi_k%C5%91fejt%C5%91.jpg/600px-R%C3%B3ka-hegyi_k%C5%91fejt%C5%91.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/R%C3%B3ka-hegyi_k%C5%91fejt%C5%91.jpg/600px-R%C3%B3ka-hegyi_k%C5%91fejt%C5%91.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Visegrádi Fellegvár",
@@ -97,7 +107,8 @@ if (count.cnt === 0) {
       lng: 18.9775,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Történelem",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Visegr%C3%A1d_Castle_%2814439178696%29.jpg/600px-Visegr%C3%A1d_Castle_%2814439178696%29.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Visegr%C3%A1d_Castle_%2814439178696%29.jpg/600px-Visegr%C3%A1d_Castle_%2814439178696%29.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Szentendre",
@@ -106,7 +117,8 @@ if (count.cnt === 0) {
       lng: 19.0756,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Városnézés",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Szentendre_f%C5%91_t%C3%A9r.jpg/600px-Szentendre_f%C5%91_t%C3%A9r.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Szentendre_f%C5%91_t%C3%A9r.jpg/600px-Szentendre_f%C5%91_t%C3%A9r.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Vácrátóti Nemzeti Botanikus Kert",
@@ -115,7 +127,8 @@ if (count.cnt === 0) {
       lng: 19.2336,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/V%C3%A1cr%C3%A1t%C3%B3t_botanical_garden.jpg/600px-V%C3%A1cr%C3%A1t%C3%B3t_botanical_garden.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/V%C3%A1cr%C3%A1t%C3%B3t_botanical_garden.jpg/600px-V%C3%A1cr%C3%A1t%C3%B3t_botanical_garden.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Martonvásári Brunszvik-kastély",
@@ -124,7 +137,8 @@ if (count.cnt === 0) {
       lng: 18.7878,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Történelem",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Brunszvik-kast%C3%A9ly_%28Martonv%C3%A1s%C3%A1r%29.jpg/600px-Brunszvik-kast%C3%A9ly_%28Martonv%C3%A1s%C3%A1r%29.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Brunszvik-kast%C3%A9ly_%28Martonv%C3%A1s%C3%A1r%29.jpg/600px-Brunszvik-kast%C3%A9ly_%28Martonv%C3%A1s%C3%A1r%29.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Nagybörzsönyi Kisvasút",
@@ -133,7 +147,8 @@ if (count.cnt === 0) {
       lng: 18.9167,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Nagyb%C3%B6rzs%C3%B6ny_forest_railway.jpg/600px-Nagyb%C3%B6rzs%C3%B6ny_forest_railway.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Nagyb%C3%B6rzs%C3%B6ny_forest_railway.jpg/600px-Nagyb%C3%B6rzs%C3%B6ny_forest_railway.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Dabasi Szent Jakab sétány",
@@ -142,7 +157,8 @@ if (count.cnt === 0) {
       lng: 19.3208,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Dabas_bog_boardwalk.jpg/600px-Dabas_bog_boardwalk.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Dabas_bog_boardwalk.jpg/600px-Dabas_bog_boardwalk.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Gödöllői Királyi Kastély",
@@ -151,7 +167,8 @@ if (count.cnt === 0) {
       lng: 19.3536,
       url: "https://csodahelyek.hu/2022/10/21/oszi-kirandulohely-kevesebb-mint-1-orara-budapesttol/",
       category: "Történelem",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Royal_Palace_of_G%C3%B6d%C3%B6ll%C5%91_001.jpg/600px-Royal_Palace_of_G%C3%B6d%C3%B6ll%C5%91_001.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Royal_Palace_of_G%C3%B6d%C3%B6ll%C5%91_001.jpg/600px-Royal_Palace_of_G%C3%B6d%C3%B6ll%C5%91_001.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Tündérszikla – János-hegy",
@@ -160,7 +177,8 @@ if (count.cnt === 0) {
       lng: 18.9528,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Elisabeth_Lookout%2C_Budapest.jpg/600px-Elisabeth_Lookout%2C_Budapest.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Elisabeth_Lookout%2C_Budapest.jpg/600px-Elisabeth_Lookout%2C_Budapest.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Japánkert – Margitsziget",
@@ -169,7 +187,8 @@ if (count.cnt === 0) {
       lng: 19.0514,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Japanese_Garden_on_Margaret_Island.jpg/600px-Japanese_Garden_on_Margaret_Island.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Japanese_Garden_on_Margaret_Island.jpg/600px-Japanese_Garden_on_Margaret_Island.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Tóth Árpád sétány – Várnegyed",
@@ -178,7 +197,8 @@ if (count.cnt === 0) {
       lng: 19.0347,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Városnézés",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Budapest%2C_Castle_District%2C_T%C3%B3th_%C3%81rp%C3%A1d_promenade.jpg/600px-Budapest%2C_Castle_District%2C_T%C3%B3th_%C3%81rp%C3%A1d_promenade.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Budapest%2C_Castle_District%2C_T%C3%B3th_%C3%81rp%C3%A1d_promenade.jpg/600px-Budapest%2C_Castle_District%2C_T%C3%B3th_%C3%81rp%C3%A1d_promenade.jpg",
+      region: "Közép-Magyarország"
     },
     {
       title: "Teve-szikla – Pilisborosjenő",
@@ -187,35 +207,174 @@ if (count.cnt === 0) {
       lng: 18.9625,
       url: "https://csodahelyek.hu/2022/10/21/oszi-kirandulohely-kevesebb-mint-1-orara-budapesttol/",
       category: "Természet",
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Teve-szikla.jpg/600px-Teve-szikla.jpg"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Teve-szikla.jpg/600px-Teve-szikla.jpg",
+      region: "Közép-Magyarország"
+    },
+    // --- Dunántúl ---
+    {
+      title: "Tihanyi Apátság",
+      description: "A Balaton-felvidék ikonikus látványossága. Az 1055-ben alapított bencés apátság az egyik legrégebbi magyar műemlék, páratlan panorámával a Balatonra.",
+      lat: 46.9131, lng: 17.8894,
+      url: "https://csodahelyek.hu/dunantul/tihanyi-apatsag",
+      category: "Történelem",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Tihany_abbey.jpg/600px-Tihany_abbey.jpg",
+      region: "Dunántúl"
+    },
+    {
+      title: "Hévízi-tó",
+      description: "A világ legnagyobb biológiailag aktív, természetes gyógytava. Télen-nyáron fürdőzhetsz a 24-36°C-os vízben.",
+      lat: 46.7878, lng: 17.1914,
+      url: "https://csodahelyek.hu/dunantul/hevizi-to",
+      category: "Természet",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/H%C3%A9v%C3%ADz_thermal_lake.jpg/600px-H%C3%A9v%C3%ADz_thermal_lake.jpg",
+      region: "Dunántúl"
+    },
+    {
+      title: "Pannonhalmi Főapátság",
+      description: "UNESCO Világörökségi helyszín, Magyarország legrégebbi történelmi emléke. A bencés szerzetesek 996 óta élnek itt.",
+      lat: 47.5503, lng: 17.7594,
+      url: "https://csodahelyek.hu/dunantul/pannonhalma",
+      category: "Történelem",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Pannonhalma_abbey.jpg/600px-Pannonhalma_abbey.jpg",
+      region: "Dunántúl"
+    },
+    {
+      title: "Orfűi-tavaknál",
+      description: "A Mecsek lábánál fekvő festői tavak fürdőzésre, horgászatra és vízitúrázásra is kiválóak. Családbarát nyaralóhely.",
+      lat: 46.1500, lng: 18.1458,
+      url: "https://csodahelyek.hu/dunantul/orfu",
+      category: "Természet",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Orfu_lake.jpg/600px-Orfu_lake.jpg",
+      region: "Dunántúl"
+    },
+    {
+      title: "Sümegi vár",
+      description: "A Dunántúl egyik legjobb állapotban fennmaradt középkori vára. Nyáron lovagi tornákat és történelmi játékokat rendeznek.",
+      lat: 46.9781, lng: 17.2828,
+      url: "https://csodahelyek.hu/dunantul/sumegi-var",
+      category: "Történelem",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/S%C3%BCmeg_Castle.jpg/600px-S%C3%BCmeg_Castle.jpg",
+      region: "Dunántúl"
+    },
+    // --- Észak-Magyarország ---
+    {
+      title: "Aggteleki-cseppkőbarlang",
+      description: "UNESCO Világörökségi helyszín. A Baradla-barlang Európa egyik leghosszabb cseppkőbarlangja, lenyűgöző föld alatti világgal.",
+      lat: 48.4703, lng: 20.4969,
+      url: "https://csodahelyek.hu/eszak/aggtelek",
+      category: "Természet",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Aggtelek_cave.jpg/600px-Aggtelek_cave.jpg",
+      region: "Észak-Magyarország"
+    },
+    {
+      title: "Egri vár",
+      description: "Az 1552-es ostromáról híres történelmi erőd. Az Egri csillagok helyszíne, múzeumokkal és kazamatákkal.",
+      lat: 47.9025, lng: 20.3772,
+      url: "https://csodahelyek.hu/eszak/egri-var",
+      category: "Történelem",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Eger_Castle.jpg/600px-Eger_Castle.jpg",
+      region: "Észak-Magyarország"
+    },
+    {
+      title: "Lillafüred",
+      description: "A Bükk-hegység gyöngyszeme. A Palotaszálló, a Hámori-tó, a Szent István-cseppkőbarlang és a függő-kertek mesés együttese.",
+      lat: 48.0978, lng: 20.6289,
+      url: "https://csodahelyek.hu/eszak/lillafured",
+      category: "Természet",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Lillaf%C3%BCred_Palace_Hotel.jpg/600px-Lillaf%C3%BCred_Palace_Hotel.jpg",
+      region: "Észak-Magyarország"
+    },
+    {
+      title: "Hollókő",
+      description: "UNESCO Világörökségi palóc falu. Húsvétkor népviseletbe öltözött helyiek és hagyományőrző ünnepségek várják a látogatókat.",
+      lat: 47.9958, lng: 19.5886,
+      url: "https://csodahelyek.hu/eszak/holloko",
+      category: "Városnézés",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Hollo%CC%81ko%CC%8B.jpg/600px-Hollo%CC%81ko%CC%8B.jpg",
+      region: "Észak-Magyarország"
+    },
+    {
+      title: "Tokaji borvidék",
+      description: "A világhírű tokaji aszú szülőföldje. UNESCO Világörökségi borvidék pincékkel, kóstolókkal és gyönyörű szőlődombokkal.",
+      lat: 48.1172, lng: 21.4097,
+      url: "https://csodahelyek.hu/eszak/tokaj",
+      category: "Városnézés",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Tokaj_vineyards.jpg/600px-Tokaj_vineyards.jpg",
+      region: "Észak-Magyarország"
+    },
+    // --- Alföld ---
+    {
+      title: "Hortobágyi Nemzeti Park",
+      description: "Magyarország első nemzeti parkja, UNESCO Világörökség. A puszta, a Kilenclyukú híd és a pásztorvilág egyedülálló élményt nyújt.",
+      lat: 47.5833, lng: 21.1500,
+      url: "https://csodahelyek.hu/alfold/hortobagy",
+      category: "Természet",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Hortob%C3%A1gy_nine-arched_bridge.jpg/600px-Hortob%C3%A1gy_nine-arched_bridge.jpg",
+      region: "Alföld"
+    },
+    {
+      title: "Tisza-tó",
+      description: "Közép-Európa egyik legnagyobb mesterséges tava. Vízitúrák, madármegfigyelés, horgászat és a nyári tiszavirágzás teszi különlegessé.",
+      lat: 47.6167, lng: 20.7333,
+      url: "https://csodahelyek.hu/alfold/tisza-to",
+      category: "Természet",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Tisza_lake.jpg/600px-Tisza_lake.jpg",
+      region: "Alföld"
+    },
+    {
+      title: "Szegedi Dóm tér",
+      description: "Magyarország egyik legszebb tere. A Fogadalmi templom, a Dömötör-torony és a nyári szabadtéri játékok helyszíne.",
+      lat: 46.2480, lng: 20.1481,
+      url: "https://csodahelyek.hu/alfold/szeged",
+      category: "Városnézés",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Szeged_cathedral.jpg/600px-Szeged_cathedral.jpg",
+      region: "Alföld"
+    },
+    {
+      title: "Kecskeméti Cifra palota",
+      description: "A magyar szecesszió egyik legszebb emléke. Díszes homlokzata a Zsolnay-kerámiák remekműve.",
+      lat: 46.9063, lng: 19.6914,
+      url: "https://csodahelyek.hu/alfold/kecskemet",
+      category: "Városnézés",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Cifrapalota.jpg/600px-Cifrapalota.jpg",
+      region: "Alföld"
+    },
+    {
+      title: "Bugaci puszta",
+      description: "A Kiskunsági Nemzeti Park szíve. Lovasbemutató, pásztormúzeum és végtelen homokpuszta várja az idelátogatókat.",
+      lat: 46.6833, lng: 19.5833,
+      url: "https://csodahelyek.hu/alfold/bugac",
+      category: "Természet",
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Bugac_puszta.jpg/600px-Bugac_puszta.jpg",
+      region: "Alföld"
     }
   ];
 
   const insertSeed = db.prepare(`
-    INSERT OR IGNORE INTO places (title, description, lat, lng, url, category, image_url)
-    VALUES (@title, @description, @lat, @lng, @url, @category, @image_url)
+    INSERT OR IGNORE INTO places (title, description, lat, lng, url, category, image_url, region)
+    VALUES (@title, @description, @lat, @lng, @url, @category, @image_url, @region)
   `);
 
-  const updateImage = db.prepare(`
-    UPDATE places SET image_url = @image_url WHERE title = @title
+  const updatePlace = db.prepare(`
+    UPDATE places SET image_url = @image_url, region = @region WHERE title = @title
   `);
 
   const seedAll = db.transaction((places: typeof seedPlaces) => {
     for (const place of places) {
       insertSeed.run(place);
-      updateImage.run({ title: place.title, image_url: place.image_url });
+      updatePlace.run({ title: place.title, image_url: place.image_url, region: place.region });
     }
   });
 
   seedAll(seedPlaces);
-  console.log(`Seeded ${seedPlaces.length} Közép-Magyarország places.`);
+  console.log(`Seeded ${seedPlaces.length} places across all regions.`);
 }
 
 // Prepare statements once for better performance
 const stmtGetPlaces = db.prepare("SELECT * FROM places");
 const stmtInsertPlace = db.prepare(`
-  INSERT INTO places (title, description, lat, lng, url, category, image_url)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO places (title, description, lat, lng, url, category, image_url, region)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 `);
 const stmtGetUser = db.prepare("SELECT id, email, name, is_pro, verified FROM users WHERE email = ?");
 const stmtGetUserWithPassword = db.prepare("SELECT * FROM users WHERE email = ?");
@@ -254,7 +413,7 @@ async function startServer() {
   });
 
   app.post("/api/places", (req, res) => {
-    const { title, description, lat, lng, url, category, image_url } = req.body;
+    const { title, description, lat, lng, url, category, image_url, region } = req.body;
 
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return res.status(400).json({ error: "A cím megadása kötelező." });
@@ -274,7 +433,8 @@ async function startServer() {
         lng,
         url?.trim() || null,
         category?.trim() || null,
-        image_url?.trim() || null
+        image_url?.trim() || null,
+        region?.trim() || "Közép-Magyarország"
       );
       res.json({ id: info.lastInsertRowid });
     } catch {
