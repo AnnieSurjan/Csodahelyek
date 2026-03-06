@@ -61,7 +61,7 @@ if (count.cnt === 0) {
       lng: 18.7194,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Történelem",
-      image_url: "https://images.unsplash.com/photo-1590080876351-941da357b7c1?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Zs%C3%A1mb%C3%A9k_-_Church_ruins.jpg/600px-Zs%C3%A1mb%C3%A9k_-_Church_ruins.jpg"
     },
     {
       title: "Budakeszi Vadaspark",
@@ -70,7 +70,7 @@ if (count.cnt === 0) {
       lng: 18.9253,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1474511320723-9a56873571b7?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Budakeszi_Vadaspark_-_panoramio_%281%29.jpg/600px-Budakeszi_Vadaspark_-_panoramio_%281%29.jpg"
     },
     {
       title: "Budakeszi Arborétum",
@@ -79,7 +79,7 @@ if (count.cnt === 0) {
       lng: 18.9189,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Budakeszi%2C_arboretum.jpg/600px-Budakeszi%2C_arboretum.jpg"
     },
     {
       title: "Róka-hegyi kőfejtő",
@@ -88,7 +88,7 @@ if (count.cnt === 0) {
       lng: 19.0139,
       url: "https://csodahelyek.hu/2025/09/15/15-latnivalo-pest-varmegyeben/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/R%C3%B3ka-hegyi_k%C5%91fejt%C5%91.jpg/600px-R%C3%B3ka-hegyi_k%C5%91fejt%C5%91.jpg"
     },
     {
       title: "Visegrádi Fellegvár",
@@ -97,7 +97,7 @@ if (count.cnt === 0) {
       lng: 18.9775,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Történelem",
-      image_url: "https://images.unsplash.com/photo-1599930464470-fcb22b6b0c03?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Visegr%C3%A1d_Castle_%2814439178696%29.jpg/600px-Visegr%C3%A1d_Castle_%2814439178696%29.jpg"
     },
     {
       title: "Szentendre",
@@ -106,7 +106,7 @@ if (count.cnt === 0) {
       lng: 19.0756,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Városnézés",
-      image_url: "https://images.unsplash.com/photo-1588253823715-cd1a3f27e03e?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Szentendre_f%C5%91_t%C3%A9r.jpg/600px-Szentendre_f%C5%91_t%C3%A9r.jpg"
     },
     {
       title: "Vácrátóti Nemzeti Botanikus Kert",
@@ -115,7 +115,7 @@ if (count.cnt === 0) {
       lng: 19.2336,
       url: "https://csodahelyek.hu/2024/10/14/20-kirandulohely-tomegkozlekedessel-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/V%C3%A1cr%C3%A1t%C3%B3t_botanical_garden.jpg/600px-V%C3%A1cr%C3%A1t%C3%B3t_botanical_garden.jpg"
     },
     {
       title: "Martonvásári Brunszvik-kastély",
@@ -124,7 +124,7 @@ if (count.cnt === 0) {
       lng: 18.7878,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Történelem",
-      image_url: "https://images.unsplash.com/photo-1568736333610-eae6e0ab9e75?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Brunszvik-kast%C3%A9ly_%28Martonv%C3%A1s%C3%A1r%29.jpg/600px-Brunszvik-kast%C3%A9ly_%28Martonv%C3%A1s%C3%A1r%29.jpg"
     },
     {
       title: "Nagybörzsönyi Kisvasút",
@@ -133,7 +133,7 @@ if (count.cnt === 0) {
       lng: 18.9167,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Nagyb%C3%B6rzs%C3%B6ny_forest_railway.jpg/600px-Nagyb%C3%B6rzs%C3%B6ny_forest_railway.jpg"
     },
     {
       title: "Dabasi Szent Jakab sétány",
@@ -142,7 +142,7 @@ if (count.cnt === 0) {
       lng: 19.3208,
       url: "https://csodahelyek.hu/2020/06/14/csodahelyek-budapest-kornyeken/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Dabas_bog_boardwalk.jpg/600px-Dabas_bog_boardwalk.jpg"
     },
     {
       title: "Gödöllői Királyi Kastély",
@@ -151,7 +151,7 @@ if (count.cnt === 0) {
       lng: 19.3536,
       url: "https://csodahelyek.hu/2022/10/21/oszi-kirandulohely-kevesebb-mint-1-orara-budapesttol/",
       category: "Történelem",
-      image_url: "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Royal_Palace_of_G%C3%B6d%C3%B6ll%C5%91_001.jpg/600px-Royal_Palace_of_G%C3%B6d%C3%B6ll%C5%91_001.jpg"
     },
     {
       title: "Tündérszikla – János-hegy",
@@ -160,7 +160,7 @@ if (count.cnt === 0) {
       lng: 18.9528,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Elisabeth_Lookout%2C_Budapest.jpg/600px-Elisabeth_Lookout%2C_Budapest.jpg"
     },
     {
       title: "Japánkert – Margitsziget",
@@ -169,7 +169,7 @@ if (count.cnt === 0) {
       lng: 19.0514,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1528164344705-47542687000d?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Japanese_Garden_on_Margaret_Island.jpg/600px-Japanese_Garden_on_Margaret_Island.jpg"
     },
     {
       title: "Tóth Árpád sétány – Várnegyed",
@@ -178,7 +178,7 @@ if (count.cnt === 0) {
       lng: 19.0347,
       url: "https://csodahelyek.hu/2021/02/04/budapest-rejtett-kincsei/",
       category: "Városnézés",
-      image_url: "https://images.unsplash.com/photo-1551268424-1a42b12956a1?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Budapest%2C_Castle_District%2C_T%C3%B3th_%C3%81rp%C3%A1d_promenade.jpg/600px-Budapest%2C_Castle_District%2C_T%C3%B3th_%C3%81rp%C3%A1d_promenade.jpg"
     },
     {
       title: "Teve-szikla – Pilisborosjenő",
@@ -187,7 +187,7 @@ if (count.cnt === 0) {
       lng: 18.9625,
       url: "https://csodahelyek.hu/2022/10/21/oszi-kirandulohely-kevesebb-mint-1-orara-budapesttol/",
       category: "Természet",
-      image_url: "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=600&h=450&fit=crop"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Teve-szikla.jpg/600px-Teve-szikla.jpg"
     }
   ];
 
@@ -196,9 +196,14 @@ if (count.cnt === 0) {
     VALUES (@title, @description, @lat, @lng, @url, @category, @image_url)
   `);
 
+  const updateImage = db.prepare(`
+    UPDATE places SET image_url = @image_url WHERE title = @title
+  `);
+
   const seedAll = db.transaction((places: typeof seedPlaces) => {
     for (const place of places) {
       insertSeed.run(place);
+      updateImage.run({ title: place.title, image_url: place.image_url });
     }
   });
 
