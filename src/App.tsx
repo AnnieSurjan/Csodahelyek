@@ -914,12 +914,21 @@ export default function App() {
         {/* Place Detail Overlay */}
         <AnimatePresence>
           {selectedPlace && (
-            <PlaceDetail
-              place={selectedPlace}
-              onClose={() => setSelectedPlace(null)}
-              isFavorite={favorites.has(selectedPlace.id)}
-              onToggleFavorite={() => handleToggleFavorite(selectedPlace.id)}
-            />
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/20 z-[1050] cursor-pointer"
+                onClick={() => setSelectedPlace(null)}
+              />
+              <PlaceDetail
+                place={selectedPlace}
+                onClose={() => setSelectedPlace(null)}
+                isFavorite={favorites.has(selectedPlace.id)}
+                onToggleFavorite={() => handleToggleFavorite(selectedPlace.id)}
+              />
+            </>
           )}
         </AnimatePresence>
       </main>
